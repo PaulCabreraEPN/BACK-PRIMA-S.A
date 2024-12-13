@@ -1,13 +1,14 @@
 import passwordGenerator from '../helpers/passwordGenerator.js'
 import Sellers from '../models/sellers.js'
 import {SendMailCredentials} from '../config/nodemailer.js';
+import usernameGenerator from '../helpers/usernameGenerator.js';
 
 
 //* Registrar un Vendedor
 
 const registerSeller = async (req, res) => {
     //* Paso 1 -Tomar Datos del Request
-    const {email,numberID,names,username} = req.body
+    const {email,numberID,names} = req.body
 
     //* Paso 2 - Validar Datos
     //? Verifica si un campo esta vacio
@@ -27,28 +28,49 @@ const registerSeller = async (req, res) => {
         return res.status(400).json({msg: "Número de cédula ya se encuentra registrado"})
     }
 
+
     //? Genera una contraseña aleatoria
-    let passwordGen = passwordGenerator()
+    const passwordGen = passwordGenerator()
+    //? Genera un usuario
+    const usernameGen = usernameGenerator(names)
+
+    //! Validar nombre usuario
+    const verifyUsername = await Sellers.findOne({username: usernameGen})
+    if(verifyUsername) {return res.status(400).json({msg: "El nombre de usuario ya se encuentra registrad"})}
 
     //* Paso 3 - Interactuar con BDD
     const newSeller = new Sellers(req.body)
     newSeller.password = await newSeller.encryptPassword(passwordGen)
+    newSeller.username = usernameGen
 
     // Crear token
     const token = newSeller.createToken()
-    SendMailCredentials(email,names,username,passwordGen)
+    SendMailCredentials(email,names,usernameGen,passwordGen,token)
 
     // Guardar en la base de datos
     await newSeller.save()
 
     // Enviar respuesta con el token
-    res.status(201).json({
-        msg: "Vendedor registrado exitosamente",
-        token
-    })
+    res.status(201).json({msg: "Vendedor registrado exitosamente",})
+}
+
+const confirmEmail = async (req,res)=>{
+    //* Paso 1 -Tomar Datos del Request
+    const {token}=req.params
+    
+    //* Paso 2 - Validar Datos
+    if(!(token)){return res.status(400).json({msg:"Lo sentimos no se puede vvalidar la cuenta"})}
+    const SellerBDD = await Sellers.findOne({token})
+    if(!SellerBDD){return res.status(400).json({msg:"la cuenta ya ha sido confirmada"})}
+    //* Paso 3 Interactuar con BDD
+    SellerBDD.token = null
+    SellerBDD.confirmEmail = true
+    await SellerBDD.save()
+    res.status(200).json({msg:"Token confirmado, ya puedes iniciar sesión"})
 }
 
 
 export {
-    registerSeller
+    registerSeller,
+    confirmEmail
 }

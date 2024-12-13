@@ -14,32 +14,36 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-const SendMailCredentials = (userMail,name, username, password) => {
+const SendMailCredentials = (userMail,name, username, password,token) => {
     let mailOptions = {
         from: process.env.USER_MAILTRAP,
         to: userMail,
         subject: 'Tu cuenta ha sido creada en PRIMA S.A.',
-        text: `
-        Hola ${name},
-
-        ¡Bienvenido/a a PRIMA S.A.! Nos complace informarte que tu cuenta ha sido creada exitosamente. A continuación, te compartimos tus credenciales de acceso:
-
-        - Usuario: ${username}
-        - Contraseña: ${password}
-
-        Para acceder a tu cuenta, visita nuestro sistema en ${process.env.URL_BACKENDMAIL} e ingresa estas credenciales.
-
-        Por razones de seguridad:
-        1. Cambia tu contraseña en el primer inicio de sesión.
-        2. No compartas esta información con nadie.
-
-        Si tienes alguna duda o necesitas ayuda, contáctanos a través de [CORREO_DE_SOPORTE] o al [TELÉFONO_DE_SOPORTE].
-
-        ¡Gracias por confiar en nosotros!
-
-        Saludos cordiales,  
-        Administrador  
-        PRIMA S.A.
+        html:
+        `
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h2 style="color: #4CAF50;">Hola ${name},</h2>
+                <p>¡Bienvenido/a a <strong>PRIMA S.A.</strong>! Nos complace informarte que tu cuenta ha sido creada exitosamente. A continuación, te compartimos tus credenciales de acceso:</p>
+                <ul>
+                    <li><strong>Usuario:</strong> ${username}</li>
+                    <li><strong>Contraseña:</strong> ${password}</li>
+                </ul>
+                <p>Para acceder a tu cuenta, visita nuestro sistema en <a href="${process.env.URL_BACK}login" target="_blank" style="color: #4CAF50; text-decoration: none;">este enlace</a> e ingresa estas credenciales.</p>
+                <h3 style="color: #4CAF50;">Importante:</h3>
+                <p>Antes de iniciar sesión, necesitas confirmar tu cuenta. Haz clic en el siguiente enlace para confirmar tu correo electrónico:</p>
+                <p><a href="${process.env.URL_BACK}confirm-account/${encodeURIComponent(token)}" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">Confirmar mi cuenta</a></p>
+                <h3>Por razones de seguridad:</h3>
+                <ol>
+                    <li>Cambia tu contraseña en el primer inicio de sesión.</li>
+                    <li>No compartas esta información con nadie.</li>
+                </ol>
+                <p>Si tienes alguna duda o necesitas ayuda, contáctanos a través de <a href="mailto:support@prima.com" style="color: #4CAF50; text-decoration: none;">support@prima.com</a> o al <strong>(+123) 456-7890</strong>.</p>
+                <p>¡Gracias por confiar en nosotros!</p>
+                <p>Saludos cordiales,</p>
+                <p><strong>Dev Prima</strong><br>PRIMA S.A.</p>
+            </body>
+        </html>
         `
     }
 
