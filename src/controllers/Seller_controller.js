@@ -54,6 +54,8 @@ const registerSeller = async (req, res) => {
     res.status(201).json({msg: "Vendedor registrado exitosamente",})
 }
 
+//* Confirmar Registro parte Vendedor
+
 const confirmEmail = async (req,res)=>{
     //* Paso 1 -Tomar Datos del Request
     const {token}=req.params
@@ -69,8 +71,29 @@ const confirmEmail = async (req,res)=>{
     res.status(200).json({msg:"Token confirmado, ya puedes iniciar sesión"})
 }
 
+const seeSellers = async(req,res) => {
+    try {
+        const sellers = await Sellers.find()
+        const response = sellers.map(seller => ({
+            _id: seller._id, 
+            name: seller.names,
+            lastNames: seller.lastNames,
+            numberID: seller.numberID,
+            email: seller.email,
+            username: seller.username,
+            PhoneNumber: seller.PhoneNumber,
+            SalesCity: seller.SalesCity,
+            role: seller.role,
+        }));
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los tipos', error: error.message });
+    }
+}
+
 
 export {
     registerSeller,
-    confirmEmail
+    confirmEmail,
+    seeSellers
 }
