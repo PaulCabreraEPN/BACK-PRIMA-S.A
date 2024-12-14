@@ -4,6 +4,8 @@ import {SendMailCredentials} from '../config/nodemailer.js';
 import usernameGenerator from '../helpers/usernameGenerator.js';
 import mongoose from 'mongoose';
 
+
+
 //*Login
 
 //* Registrar un Vendedor
@@ -193,10 +195,147 @@ const searchSellerByNumberId = async (req, res) =>{
    
 }
 
+// Actualizar vendedor - patch 
+
+const updateSellerController = async (req, res) => {
+    //* Paso 1 - Tomar Datos del Request
+    const { id } = req.params; // ID del vendedor a actualizar
+    const updates = req.body; // Datos a actualizar
+
+    //* Paso 2 - Validar Datos
+    // Validar si el id es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({
+        msg: `Lo sentimos, no existe el vendedor con el id ${id} ingrese un id valido para actualizar `
+    });
+
+    // Obtener los atributos válidos del modelo
+    const validFields = ['email', 'PhoneNumber', 'SalesCity'];
+    const filteredUpdates = {};
+
+    // Filtrar los campos válidos para la actualización
+    for (const key in updates) {
+        if (validFields.includes(key)) {
+            filteredUpdates[key] = updates[key];
+        }
+    }
+
+    // Validar si hay campos válidos para actualizar
+    if (Object.keys(filteredUpdates).length === 0) {
+        return res.status(400).json({ msg: "No se proporcionaron campos válidos para actualizar" });
+    }
+
+    try {
+        //* Paso 3 - Interactuar con BDD
+
+        // Realizar la actualización
+        await Sellers.findByIdAndUpdate(id, filteredUpdates, { new: true });
+
+        // Obtener el registro actualizado, excluyendo el campo "password"
+        const updatedSeller = await Sellers.findById(id).lean().select("-password -__v");
+
+        // Responder con el registro actualizado
+        return res.status(200).json({
+            msg: "Vendedor actualizado correctamente",
+            data: updatedSeller,
+        });
+    } catch (error) {
+        // Manejo de errores
+        console.error(error);
+        return res.status(500).json({ msg: "Error interno del servidor", error: error.message });
+    }
+};
+
+
+
+//* Actualizar completamente un vendedor - put 
+const UpdateAllSellerController = async (req, res) => {
+    //* Paso 1 - Tomar Datos del Request
+    const { id } = req.params; // ID del vendedor a actualizar
+    const { email, PhoneNumber, SalesCity, ...otherData } = req.body; // Datos a actualizar
+
+    //* Paso 2 - Validar Datos
+
+    // Validar si el id es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({
+        msg: `Lo sentimos, no existe el vendedor con el id ${id} ingrese un id valido para actualizar `
+    });
+
+    // Función para verificar campos vacíos
+    const areFieldsEmpty = (...fields) => fields.some(field => !field || field.trim() === "");
+
+    // Validar campos obligatorios
+    if (areFieldsEmpty(email, PhoneNumber, SalesCity)) {
+        return res.status(400).json({
+            error: "Datos vacíos. Por favor, llene todos los campos."
+        });
+    }
+
+    try {
+        //* Paso 3 - Interactuar con BDD
+        
+
+        // Construir los datos para la actualización
+        const updatedData = {
+            email,
+            PhoneNumber,
+            SalesCity,
+            ...otherData // otros campos adicionales que podrían ser enviados en el request
+        };
+
+        // Actualizar el vendedor en la base de datos
+        const updatedSeller = await Sellers.findByIdAndUpdate(id, updatedData, { new: true });
+
+        // Responder con el vendedor actualizado (sin el campo "password" por seguridad)
+        return res.status(200).json({
+            msg: "Vendedor actualizado correctamente",
+            data: updatedSeller,
+        });
+    } catch (error) {
+        // Manejo de errores
+        console.error(error);
+        return res.status(500).json({ msg: "Error interno del servidor", error: error.message });
+    }
+};
+
+//Eliminar 
+//* Eliminar un vendedor por ID - delete
+const DeleteSellerController = async (req, res) => {
+    //* Paso 1 - Tomar Datos del Request
+    const { id } = req.params; // ID del vendedor a eliminar
+
+    //* Paso 2 - Validar Datos
+
+    // Validar si el id es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({
+        msg: `Lo sentimos, no existe el vendedor con el id ${id}. Por favor, ingrese un ID válido para eliminar.`
+    });
+
+    try {
+        //* Paso 3 - Interactuar con BDD
+
+        // Buscar y eliminar el vendedor en la base de datos
+        const deletedSeller = await Sellers.findByIdAndDelete(id);
+
+        // Responder con éxito
+        return res.status(200).json({
+            msg: "Vendedor eliminado correctamente",
+            data: deletedSeller
+        });
+    } catch (error) {
+        // Manejo de errores
+        console.error(error);
+        return res.status(500).json({ msg: "Error interno del servidor", error: error.message });
+    }
+};
+
+
 export {
     registerSeller,
     confirmEmail,
     seeSellers,
     searchSellerById,
-    searchSellerByNumberId
+    searchSellerByNumberId,
+    updateSellerController,
+    UpdateAllSellerController,
+    DeleteSellerController
 }
