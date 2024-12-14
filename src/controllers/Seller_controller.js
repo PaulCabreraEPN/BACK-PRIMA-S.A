@@ -108,7 +108,7 @@ const seeSellers = async(req,res) => {
 }
 
 //* Buscar un vendedor
-
+// Por object ID
 const searchSellerById = async (req, res) => {
     //* Paso 1 - Tomar Datos del Request
     const { id } = req.params;
@@ -150,10 +150,55 @@ const searchSellerById = async (req, res) => {
     }
 }
 
+// Por cedula
+const searchSellerByNumberId = async (req, res) =>{
+    //* Paso 1 - Tomar Datos del Request
+    const { numberID } = req.body;
+    
+    //* Paso 2 - Validar Datos
+    if (!numberID || numberID.toString().trim() === ""){
+        return res.status(400).json({msg: "Lo sentimos, debes propocionar la cédula del vendedor"})
+    }
+
+    const longitud = String(numberID).length;
+    if (longitud!==10){
+        return res.status(400).json({msg: "Lo sentimos, formato de cédula invalido"})
+    }
+
+    try {
+        //* Paso 3 - Interactuar con BDD
+        const seller = await Sellers.findOne({ numberID }); 
+        if (!seller) {
+            return res.status(404).json({
+                msg: "Vendedor no encontrado"
+            });
+        }
+
+        const idSeller = {
+            _id: seller._id, 
+            name: seller.names,
+            lastNames: seller.lastNames,
+            numberID: seller.numberID,
+            email: seller.email,
+            username: seller.username,
+            PhoneNumber: seller.PhoneNumber,
+            SalesCity: seller.SalesCity,
+            role: seller.role,
+        }
+
+        return res.status(200).json({ msg: idSeller });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: "Error al buscar el vendedor" });
+    }
+   
+}
 
 export {
     registerSeller,
     confirmEmail,
     seeSellers,
-    searchSellerById
+    searchSellerById,
+    searchSellerByNumberId
 }

@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { confirmEmail, registerSeller, searchSellerById, seeSellers } from '../controllers/Seller_controller.js'
+import { confirmEmail, registerSeller, searchSellerById, searchSellerByNumberId, seeSellers } from '../controllers/Seller_controller.js'
 
 const router = Router()
 
@@ -7,5 +7,7 @@ const router = Router()
 router.post("/register",registerSeller)
 router.get('/confirm-account/:token',confirmEmail)
 router.get('/sellers',seeSellers)
+router.get('/sellers-numberid',searchSellerByNumberId)
 router.get('/sellers/:id', searchSellerById)
+
 export default router
