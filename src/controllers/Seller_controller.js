@@ -110,14 +110,25 @@ const searchSellerById = async (req, res) => {
 
     //* Paso 3 - Interactuar con BDD
     try {
-        const Seller = await Sellers.findById(id); // Usamos findById para buscar por _id
-        if (!Seller) {
+        const seller = await Sellers.findById(id) // Usamos findById para buscar por _id
+        if (!seller) {
             return res.status(404).json({
                 msg: "Vendedor no encontrado"
             });
         }
-        console.log(Seller); // Opcional: puedes loguear el vendedor para depuración
-        return res.status(200).json({ msg: Seller });
+        const idSeller = {
+            _id: seller._id, 
+            name: seller.names,
+            lastNames: seller.lastNames,
+            numberID: seller.numberID,
+            email: seller.email,
+            username: seller.username,
+            PhoneNumber: seller.PhoneNumber,
+            SalesCity: seller.SalesCity,
+            role: seller.role,
+        }
+
+        return res.status(200).json({ msg: idSeller });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: "Error al buscar el vendedor" });
