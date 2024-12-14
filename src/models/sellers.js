@@ -27,7 +27,8 @@ const SellersSchema = new Schema({
     username:{
         type:String,
         require:true,
-        trim:true
+        trim:true,
+        unique:true
     },
     password:{
         type:String,

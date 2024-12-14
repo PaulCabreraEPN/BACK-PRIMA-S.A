@@ -29,10 +29,10 @@ const SendMailCredentials = (userMail,name, username, password,token) => {
                     <li><strong>Usuario:</strong> ${username}</li>
                     <li><strong>Contraseña:</strong> ${password}</li>
                 </ul>
-                <p>Para acceder a tu cuenta, visita nuestro sistema en <a href="${process.env.URL_BACK}login" target="_blank" style="color: #4CAF50; text-decoration: none;">este enlace</a> e ingresa estas credenciales.</p>
+                <p>Para acceder a tu cuenta, visita nuestro sistema en <a href="${process.env.URL_BACK}/login" target="_blank" style="color: #4CAF50; text-decoration: none;">este enlace</a> e ingresa estas credenciales.</p>
                 <h3 style="color: #4CAF50;">Importante:</h3>
                 <p>Antes de iniciar sesión, necesitas confirmar tu cuenta. Haz clic en el siguiente enlace para confirmar tu correo electrónico:</p>
-                <p><a href="${process.env.URL_BACK}confirm-account/${encodeURIComponent(token)}" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">Confirmar mi cuenta</a></p>
+                <p><a href="${process.env.URL_BACK}/confirm-account/${encodeURIComponent(token)}" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">Confirmar mi cuenta</a></p>
                 <h3>Por razones de seguridad:</h3>
                 <ol>
                     <li>Cambia tu contraseña en el primer inicio de sesión.</li>

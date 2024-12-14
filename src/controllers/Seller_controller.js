@@ -7,7 +7,8 @@ import usernameGenerator from '../helpers/usernameGenerator.js';
 //* Registrar un Vendedor
 
 const registerSeller = async (req, res) => {
-    //* Paso 1 -Tomar Datos del Request
+    try {
+        //* Paso 1 -Tomar Datos del Request
     const {email,numberID,names} = req.body
 
     //* Paso 2 - Validar Datos
@@ -32,12 +33,17 @@ const registerSeller = async (req, res) => {
     //? Genera una contraseña aleatoria
     const passwordGen = passwordGenerator()
     //? Genera un usuario
-    const usernameGen = usernameGenerator(names)
+    let usernameGen = usernameGenerator(names)
 
-    //! Validar nombre usuario
-    const verifyUsername = await Sellers.findOne({username: usernameGen})
-    if(verifyUsername) {return res.status(400).json({msg: "El nombre de usuario ya se encuentra registrad"})}
+    //? Verificar Username
+    let verifyUsername = await Sellers.findOne({ username: usernameGen });
 
+    // Mientras el username esté en uso, genera uno nuevo
+    while (verifyUsername) {
+        usernameGen = usernameGenerator(names);  // Genera un nuevo username
+        verifyUsername = await Sellers.findOne({ username: usernameGen });  // Verifica si ya existe
+    }
+    
     //* Paso 3 - Interactuar con BDD
     const newSeller = new Sellers(req.body)
     newSeller.password = await newSeller.encryptPassword(passwordGen)
@@ -52,12 +58,17 @@ const registerSeller = async (req, res) => {
 
     // Enviar respuesta con el token
     res.status(201).json({msg: "Vendedor registrado exitosamente",})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg: "Error al registrar el vendedor",error: error.message})
+    }
 }
 
 //* Confirmar Registro parte Vendedor
 
 const confirmEmail = async (req,res)=>{
-    //* Paso 1 -Tomar Datos del Request
+    try {
+        //* Paso 1 -Tomar Datos del Request
     const {token}=req.params
     
     //* Paso 2 - Validar Datos
@@ -69,6 +80,10 @@ const confirmEmail = async (req,res)=>{
     SellerBDD.confirmEmail = true
     await SellerBDD.save()
     res.status(200).json({msg:"Token confirmado, ya puedes iniciar sesión"})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg: "Error al confirmar el registro",error: error.message})
+    }
 }
 
 const seeSellers = async(req,res) => {
