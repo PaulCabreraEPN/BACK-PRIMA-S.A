@@ -4,9 +4,9 @@ import {SendMailCredentials} from '../config/nodemailer.js';
 import usernameGenerator from '../helpers/usernameGenerator.js';
 import mongoose from 'mongoose';
 
+//*Login
 
 //* Registrar un Vendedor
-
 const registerSeller = async (req, res) => {
     try {
         //* Paso 1 -Tomar Datos del Request
@@ -66,7 +66,6 @@ const registerSeller = async (req, res) => {
 }
 
 //* Confirmar Registro parte Vendedor
-
 const confirmEmail = async (req,res)=>{
     try {
         //* Paso 1 -Tomar Datos del Request
@@ -107,8 +106,7 @@ const seeSellers = async(req,res) => {
     }
 }
 
-//* Buscar un vendedor
-// Por object ID
+//* Buscar un vendedor por ObjectID
 const searchSellerById = async (req, res) => {
     //* Paso 1 - Tomar Datos del Request
     const { id } = req.params;
@@ -150,7 +148,7 @@ const searchSellerById = async (req, res) => {
     }
 }
 
-// Por cedula
+//* Buscar un vendedor por cedula
 const searchSellerByNumberId = async (req, res) =>{
     //* Paso 1 - Tomar Datos del Request
     const { numberID } = req.body;
