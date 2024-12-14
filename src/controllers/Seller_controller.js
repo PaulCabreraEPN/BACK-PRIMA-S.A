@@ -2,6 +2,7 @@ import passwordGenerator from '../helpers/passwordGenerator.js'
 import Sellers from '../models/sellers.js'
 import {SendMailCredentials} from '../config/nodemailer.js';
 import usernameGenerator from '../helpers/usernameGenerator.js';
+import mongoose from 'mongoose';
 
 
 //* Registrar un Vendedor
@@ -106,9 +107,42 @@ const seeSellers = async(req,res) => {
     }
 }
 
+//* Buscar un vendedor
+
+const searchSellerById = async (req, res) => {
+    //* Paso 1 - Tomar Datos del Request
+    const { id } = req.params;
+    
+    //* Paso 2 - Validar Datos
+    if (!id) return res.status(404).json({
+        msg: "Por favor ingrese un id válido"
+    });
+
+    // Validar si el id es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({
+        msg: `Lo sentimos, no existe el vendedor con el id ${id}`
+    });
+
+    //* Paso 3 - Interactuar con BDD
+    try {
+        const Seller = await Sellers.findById(id); // Usamos findById para buscar por _id
+        if (!Seller) {
+            return res.status(404).json({
+                msg: "Vendedor no encontrado"
+            });
+        }
+        console.log(Seller); // Opcional: puedes loguear el vendedor para depuración
+        return res.status(200).json({ msg: Seller });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: "Error al buscar el vendedor" });
+    }
+}
+
 
 export {
     registerSeller,
     confirmEmail,
-    seeSellers
+    seeSellers,
+    searchSellerById
 }
