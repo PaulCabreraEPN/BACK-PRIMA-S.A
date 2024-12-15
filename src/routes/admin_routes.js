@@ -3,15 +3,21 @@ import { confirmEmail, registerSeller, searchSellerById, searchSellerByNumberId,
 
 const router = Router()
 
-//* Ruta para registrar Usuarios
+//* Rutas Vendedores
+// Ruta para registrar 
 router.post("/register",registerSeller)
 router.get('/confirm-account/:token',confirmEmail)
+// Ruta para ver
 router.get('/sellers',seeSellers)
+// Rutas para Buscar
 router.get('/sellers-numberid',searchSellerByNumberId)
 router.get('/sellers/:id', searchSellerById)
-// Ruta para actualizar 
+// Rutas para actualizar 
 router.patch("/updateSeller/:id",updateSellerController)
 router.put("/updateAllSellerinfo/:id",UpdateAllSellerController)
-//Eliminar
+// Ruta para Eliminar 
 router.delete("/deleteSellerinfo/:id",DeleteSellerController)
+
+//* Rutas Inventario
+
 export default router
