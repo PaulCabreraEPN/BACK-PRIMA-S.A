@@ -3,6 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import adminRoutes from './routes/admin_routes.js';
+import productRoutes from './routes/products_routes.js';
 
 
 
@@ -27,6 +28,7 @@ app.get('/',(req,res)=>{
 });
 
 app.use('/api/',adminRoutes)
+app.use('/api/',productRoutes)
 
 //Rutas no encontradas
 

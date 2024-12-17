@@ -4,7 +4,6 @@ const ProductSchema = new Schema({
     id:{
         type:Number,
         required:true,
-        trim:true,
         unique:true
     },
     product_name:{
@@ -20,21 +19,17 @@ const ProductSchema = new Schema({
     price:{
         type:Number,
         required:true,
-        trim:true
     },
     stock:{
         type:Number,
         required:true,
-        trim:true
     },
     imgUrl:{
         type:String,
         required:true,
         trim:true
     }
-},{
-    timestamps:true
 })
 
-export default model('Products',ProductSchema)
+export default model('products',ProductSchema)
 
